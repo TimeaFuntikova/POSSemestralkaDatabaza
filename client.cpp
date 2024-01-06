@@ -14,7 +14,7 @@ int main() {
     sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Replace with your server's IP
-    serverAddr.sin_port = htons(10102);
+    serverAddr.sin_port = htons(10111);
     std::string operation = "";
     std::string loginId = "";
     int needToLogin = 0;
@@ -27,7 +27,7 @@ int main() {
             std::cin >> a;
             if (a == 1) {
                 std::cin >> params;
-                operation = "login," + params;
+                operation = "LOGIN," + params + ",";
             }
         }
         if (connect(clientSocket, reinterpret_cast<struct sockaddr*>(&serverAddr), sizeof(serverAddr)) == -1) {

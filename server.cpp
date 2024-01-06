@@ -11,7 +11,7 @@
 std::string processRequest(const std::string& request, DatabaseLogic& db) {
     std::istringstream iss(request);
     std::string command;
-    iss >> command;
+    std::getline(iss,command,',');
 
     if (command == "CREATE") {
         std::string table;
@@ -33,9 +33,12 @@ std::string processRequest(const std::string& request, DatabaseLogic& db) {
         // Similar logic for UPDATE
     } else if (command == "DELETE") {
         // Similar logic for DELETE
-    } else if (command == "pr")
-    {
-        db.loginUser()
+    } else if (command == "LOGIN") {
+        std::string username,password;
+        std::getline(iss,username,',');
+        std::getline(iss,password, ',');
+
+        db.loginUser(username,password);
     }
     return "Unknown command.\n";
 
@@ -83,7 +86,7 @@ int main() {
 
     struct sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(10102);
+    serverAddr.sin_port = htons(10111);
     serverAddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == -1) {

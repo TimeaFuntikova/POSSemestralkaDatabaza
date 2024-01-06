@@ -3,6 +3,7 @@
 #include "sstream"
 #include "DatabaseLogic.h"
 #include "string"
+#include "WriteIntoFile.h"
 
 
 using namespace std;
@@ -36,11 +37,13 @@ string DatabaseLogic::addColumn(string columnName, DataType type)
 }
 
 string DatabaseLogic::loginUser(string userName, string password) {
-    string fileName = "./Users_table.csv";
+    const char *fileName = "Users_table.txt";
+    //todo iny subor
    // ifstream file(fileName);
-    if (fileExists(fileName)) {
-        writeCsvFile(fileName, "id,username,password");
-        writeCsvFile(fileName, "0,admin,admin");
+    if (!fileExists((string &) fileName)) {
+        WriteIntoFile* zapis = new WriteIntoFile(fileName);
+        zapis->Write(reinterpret_cast<const unsigned char *>("id,username,password"));
+        zapis->Write(reinterpret_cast<const unsigned char *>("0,admin,admin"));
     }
     if (findUserinCsvFile(fileName, userName, password) == userName) {
         cout<<userName;

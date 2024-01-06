@@ -130,17 +130,30 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named semestralka
+# Target rules for targets named client
 
 # Build rule for target.
-semestralka: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 semestralka
-.PHONY : semestralka
+client: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 client
+.PHONY : client
 
 # fast build rule for target.
-semestralka/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/build
-.PHONY : semestralka/fast
+client/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/build
+.PHONY : client/fast
+
+#=============================================================================
+# Target rules for targets named server
+
+# Build rule for target.
+server: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 server
+.PHONY : server
+
+# fast build rule for target.
+server/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/build
+.PHONY : server/fast
 
 DatabaseLogic.o: DatabaseLogic.cpp.o
 
@@ -148,7 +161,7 @@ DatabaseLogic.o: DatabaseLogic.cpp.o
 
 # target to build an object file
 DatabaseLogic.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/DatabaseLogic.cpp.o
 .PHONY : DatabaseLogic.cpp.o
 
 DatabaseLogic.i: DatabaseLogic.cpp.i
@@ -157,7 +170,7 @@ DatabaseLogic.i: DatabaseLogic.cpp.i
 
 # target to preprocess a source file
 DatabaseLogic.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/DatabaseLogic.cpp.i
 .PHONY : DatabaseLogic.cpp.i
 
 DatabaseLogic.s: DatabaseLogic.cpp.s
@@ -166,35 +179,8 @@ DatabaseLogic.s: DatabaseLogic.cpp.s
 
 # target to generate assembly for a file
 DatabaseLogic.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/DatabaseLogic.cpp.s
 .PHONY : DatabaseLogic.cpp.s
-
-Tables.o: Tables.cpp.o
-
-.PHONY : Tables.o
-
-# target to build an object file
-Tables.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.o
-.PHONY : Tables.cpp.o
-
-Tables.i: Tables.cpp.i
-
-.PHONY : Tables.i
-
-# target to preprocess a source file
-Tables.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.i
-.PHONY : Tables.cpp.i
-
-Tables.s: Tables.cpp.s
-
-.PHONY : Tables.s
-
-# target to generate assembly for a file
-Tables.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.s
-.PHONY : Tables.cpp.s
 
 client.o: client.cpp.o
 
@@ -202,7 +188,7 @@ client.o: client.cpp.o
 
 # target to build an object file
 client.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/client.cpp.o
 .PHONY : client.cpp.o
 
 client.i: client.cpp.i
@@ -211,7 +197,7 @@ client.i: client.cpp.i
 
 # target to preprocess a source file
 client.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/client.cpp.i
 .PHONY : client.cpp.i
 
 client.s: client.cpp.s
@@ -220,8 +206,35 @@ client.s: client.cpp.s
 
 # target to generate assembly for a file
 client.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/client.dir/build.make CMakeFiles/client.dir/client.cpp.s
 .PHONY : client.cpp.s
+
+server.o: server.cpp.o
+
+.PHONY : server.o
+
+# target to build an object file
+server.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/server.cpp.o
+.PHONY : server.cpp.o
+
+server.i: server.cpp.i
+
+.PHONY : server.i
+
+# target to preprocess a source file
+server.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/server.cpp.i
+.PHONY : server.cpp.i
+
+server.s: server.cpp.s
+
+.PHONY : server.s
+
+# target to generate assembly for a file
+server.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/server.cpp.s
+.PHONY : server.cpp.s
 
 # Help Target
 help:
@@ -231,16 +244,17 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... semestralka"
+	@echo "... client"
+	@echo "... server"
 	@echo "... DatabaseLogic.o"
 	@echo "... DatabaseLogic.i"
 	@echo "... DatabaseLogic.s"
-	@echo "... Tables.o"
-	@echo "... Tables.i"
-	@echo "... Tables.s"
 	@echo "... client.o"
 	@echo "... client.i"
 	@echo "... client.s"
+	@echo "... server.o"
+	@echo "... server.i"
+	@echo "... server.s"
 .PHONY : help
 
 
