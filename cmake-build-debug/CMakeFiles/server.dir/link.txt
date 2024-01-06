@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -rdynamic CMakeFiles/server.dir/server.cpp.o CMakeFiles/server.dir/DatabaseLogic.cpp.o -o server  -lpthread 

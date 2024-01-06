@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/tmp/tmp.OcGwTyYegT/DatabaseLogic.h
+string
+-
+Tables.h
+/tmp/tmp.OcGwTyYegT/Tables.h
+
+/tmp/tmp.OcGwTyYegT/Tables.h
+vector
+-
+string
+-
+map
+-
+optional
+-
+mutex
+-
+DatabaseLogic.h
+/tmp/tmp.OcGwTyYegT/DatabaseLogic.h
+
+/tmp/tmp.OcGwTyYegT/server.cpp
+iostream
+-
+pthread.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+unistd.h
+-
+sstream
+-
+arpa/inet.h
+-
+DatabaseLogic.h
+/tmp/tmp.OcGwTyYegT/DatabaseLogic.h
+
