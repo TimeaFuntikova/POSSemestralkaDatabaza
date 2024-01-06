@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/tmp/tmp.OcGwTyYegT/client.cpp
+iostream
+-
+cstdlib
+-
+cstring
+-
+unistd.h
+-
+arpa/inet.h
+-
+
