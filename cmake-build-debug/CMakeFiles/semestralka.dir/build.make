@@ -62,10 +62,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /tmp/semestralka
+CMAKE_SOURCE_DIR = /tmp/tmp.OcGwTyYegT
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /tmp/semestralka/cmake-build-debug
+CMAKE_BINARY_DIR = /tmp/tmp.OcGwTyYegT/cmake-build-debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/semestralka.dir/depend.make
@@ -76,30 +76,60 @@ include CMakeFiles/semestralka.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/semestralka.dir/flags.make
 
-CMakeFiles/semestralka.dir/main.cpp.o: CMakeFiles/semestralka.dir/flags.make
-CMakeFiles/semestralka.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/semestralka.dir/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/main.cpp.o -c /tmp/semestralka/main.cpp
+CMakeFiles/semestralka.dir/client.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/client.cpp.o: ../client.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/semestralka.dir/client.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/client.cpp.o -c /tmp/tmp.OcGwTyYegT/client.cpp
 
-CMakeFiles/semestralka.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/semestralka/main.cpp > CMakeFiles/semestralka.dir/main.cpp.i
+CMakeFiles/semestralka.dir/client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/client.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/tmp.OcGwTyYegT/client.cpp > CMakeFiles/semestralka.dir/client.cpp.i
 
-CMakeFiles/semestralka.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/semestralka/main.cpp -o CMakeFiles/semestralka.dir/main.cpp.s
+CMakeFiles/semestralka.dir/client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/client.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/tmp.OcGwTyYegT/client.cpp -o CMakeFiles/semestralka.dir/client.cpp.s
+
+CMakeFiles/semestralka.dir/Tables.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/Tables.cpp.o: ../Tables.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/semestralka.dir/Tables.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/Tables.cpp.o -c /tmp/tmp.OcGwTyYegT/Tables.cpp
+
+CMakeFiles/semestralka.dir/Tables.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/Tables.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/tmp.OcGwTyYegT/Tables.cpp > CMakeFiles/semestralka.dir/Tables.cpp.i
+
+CMakeFiles/semestralka.dir/Tables.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/Tables.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/tmp.OcGwTyYegT/Tables.cpp -o CMakeFiles/semestralka.dir/Tables.cpp.s
+
+CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o: ../DatabaseLogic.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o -c /tmp/tmp.OcGwTyYegT/DatabaseLogic.cpp
+
+CMakeFiles/semestralka.dir/DatabaseLogic.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/DatabaseLogic.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/tmp.OcGwTyYegT/DatabaseLogic.cpp > CMakeFiles/semestralka.dir/DatabaseLogic.cpp.i
+
+CMakeFiles/semestralka.dir/DatabaseLogic.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/DatabaseLogic.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/tmp.OcGwTyYegT/DatabaseLogic.cpp -o CMakeFiles/semestralka.dir/DatabaseLogic.cpp.s
 
 # Object files for target semestralka
 semestralka_OBJECTS = \
-"CMakeFiles/semestralka.dir/main.cpp.o"
+"CMakeFiles/semestralka.dir/client.cpp.o" \
+"CMakeFiles/semestralka.dir/Tables.cpp.o" \
+"CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o"
 
 # External object files for target semestralka
 semestralka_EXTERNAL_OBJECTS =
 
-semestralka: CMakeFiles/semestralka.dir/main.cpp.o
+semestralka: CMakeFiles/semestralka.dir/client.cpp.o
+semestralka: CMakeFiles/semestralka.dir/Tables.cpp.o
+semestralka: CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o
 semestralka: CMakeFiles/semestralka.dir/build.make
 semestralka: CMakeFiles/semestralka.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable semestralka"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable semestralka"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/semestralka.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -112,6 +142,6 @@ CMakeFiles/semestralka.dir/clean:
 .PHONY : CMakeFiles/semestralka.dir/clean
 
 CMakeFiles/semestralka.dir/depend:
-	cd /tmp/semestralka/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /tmp/semestralka /tmp/semestralka /tmp/semestralka/cmake-build-debug /tmp/semestralka/cmake-build-debug /tmp/semestralka/cmake-build-debug/CMakeFiles/semestralka.dir/DependInfo.cmake --color=$(COLOR)
+	cd /tmp/tmp.OcGwTyYegT/cmake-build-debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /tmp/tmp.OcGwTyYegT /tmp/tmp.OcGwTyYegT /tmp/tmp.OcGwTyYegT/cmake-build-debug /tmp/tmp.OcGwTyYegT/cmake-build-debug /tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles/semestralka.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/semestralka.dir/depend
 

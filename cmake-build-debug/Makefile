@@ -67,10 +67,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /tmp/semestralka
+CMAKE_SOURCE_DIR = /tmp/tmp.OcGwTyYegT
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /tmp/semestralka/cmake-build-debug
+CMAKE_BINARY_DIR = /tmp/tmp.OcGwTyYegT/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/semestralka/cmake-build-debug/CMakeFiles /tmp/semestralka/cmake-build-debug//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles /tmp/tmp.OcGwTyYegT/cmake-build-debug//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/semestralka/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.OcGwTyYegT/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -142,32 +142,86 @@ semestralka/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/build
 .PHONY : semestralka/fast
 
-main.o: main.cpp.o
+DatabaseLogic.o: DatabaseLogic.cpp.o
 
-.PHONY : main.o
+.PHONY : DatabaseLogic.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/main.cpp.o
-.PHONY : main.cpp.o
+DatabaseLogic.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o
+.PHONY : DatabaseLogic.cpp.o
 
-main.i: main.cpp.i
+DatabaseLogic.i: DatabaseLogic.cpp.i
 
-.PHONY : main.i
+.PHONY : DatabaseLogic.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/main.cpp.i
-.PHONY : main.cpp.i
+DatabaseLogic.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.i
+.PHONY : DatabaseLogic.cpp.i
 
-main.s: main.cpp.s
+DatabaseLogic.s: DatabaseLogic.cpp.s
 
-.PHONY : main.s
+.PHONY : DatabaseLogic.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/main.cpp.s
-.PHONY : main.cpp.s
+DatabaseLogic.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/DatabaseLogic.cpp.s
+.PHONY : DatabaseLogic.cpp.s
+
+Tables.o: Tables.cpp.o
+
+.PHONY : Tables.o
+
+# target to build an object file
+Tables.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.o
+.PHONY : Tables.cpp.o
+
+Tables.i: Tables.cpp.i
+
+.PHONY : Tables.i
+
+# target to preprocess a source file
+Tables.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.i
+.PHONY : Tables.cpp.i
+
+Tables.s: Tables.cpp.s
+
+.PHONY : Tables.s
+
+# target to generate assembly for a file
+Tables.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/Tables.cpp.s
+.PHONY : Tables.cpp.s
+
+client.o: client.cpp.o
+
+.PHONY : client.o
+
+# target to build an object file
+client.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.o
+.PHONY : client.cpp.o
+
+client.i: client.cpp.i
+
+.PHONY : client.i
+
+# target to preprocess a source file
+client.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.i
+.PHONY : client.cpp.i
+
+client.s: client.cpp.s
+
+.PHONY : client.s
+
+# target to generate assembly for a file
+client.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/semestralka.dir/build.make CMakeFiles/semestralka.dir/client.cpp.s
+.PHONY : client.cpp.s
 
 # Help Target
 help:
@@ -178,9 +232,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... semestralka"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... DatabaseLogic.o"
+	@echo "... DatabaseLogic.i"
+	@echo "... DatabaseLogic.s"
+	@echo "... Tables.o"
+	@echo "... Tables.i"
+	@echo "... Tables.s"
+	@echo "... client.o"
+	@echo "... client.i"
+	@echo "... client.s"
 .PHONY : help
 
 
