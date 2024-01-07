@@ -1,1 +1,1 @@
-/usr/bin/c++ -g -rdynamic CMakeFiles/semestralka.dir/main.cpp.o -o semestralka 
+/usr/bin/c++ -g -rdynamic CMakeFiles/semestralka.dir/server.cpp.o CMakeFiles/semestralka.dir/client.cpp.o CMakeFiles/semestralka.dir/database.cpp.o -o semestralka  -lpthread 

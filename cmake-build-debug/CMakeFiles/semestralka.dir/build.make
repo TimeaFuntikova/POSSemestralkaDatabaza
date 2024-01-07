@@ -76,30 +76,60 @@ include CMakeFiles/semestralka.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/semestralka.dir/flags.make
 
-CMakeFiles/semestralka.dir/main.cpp.o: CMakeFiles/semestralka.dir/flags.make
-CMakeFiles/semestralka.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/semestralka.dir/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/main.cpp.o -c /tmp/semestralka/main.cpp
+CMakeFiles/semestralka.dir/server.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/server.cpp.o: ../server.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/semestralka.dir/server.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/server.cpp.o -c /tmp/semestralka/server.cpp
 
-CMakeFiles/semestralka.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/semestralka/main.cpp > CMakeFiles/semestralka.dir/main.cpp.i
+CMakeFiles/semestralka.dir/server.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/server.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/semestralka/server.cpp > CMakeFiles/semestralka.dir/server.cpp.i
 
-CMakeFiles/semestralka.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/semestralka/main.cpp -o CMakeFiles/semestralka.dir/main.cpp.s
+CMakeFiles/semestralka.dir/server.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/server.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/semestralka/server.cpp -o CMakeFiles/semestralka.dir/server.cpp.s
+
+CMakeFiles/semestralka.dir/client.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/client.cpp.o: ../client.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/semestralka.dir/client.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/client.cpp.o -c /tmp/semestralka/client.cpp
+
+CMakeFiles/semestralka.dir/client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/client.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/semestralka/client.cpp > CMakeFiles/semestralka.dir/client.cpp.i
+
+CMakeFiles/semestralka.dir/client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/client.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/semestralka/client.cpp -o CMakeFiles/semestralka.dir/client.cpp.s
+
+CMakeFiles/semestralka.dir/database.cpp.o: CMakeFiles/semestralka.dir/flags.make
+CMakeFiles/semestralka.dir/database.cpp.o: ../database.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/semestralka.dir/database.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/semestralka.dir/database.cpp.o -c /tmp/semestralka/database.cpp
+
+CMakeFiles/semestralka.dir/database.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/semestralka.dir/database.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /tmp/semestralka/database.cpp > CMakeFiles/semestralka.dir/database.cpp.i
+
+CMakeFiles/semestralka.dir/database.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/semestralka.dir/database.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /tmp/semestralka/database.cpp -o CMakeFiles/semestralka.dir/database.cpp.s
 
 # Object files for target semestralka
 semestralka_OBJECTS = \
-"CMakeFiles/semestralka.dir/main.cpp.o"
+"CMakeFiles/semestralka.dir/server.cpp.o" \
+"CMakeFiles/semestralka.dir/client.cpp.o" \
+"CMakeFiles/semestralka.dir/database.cpp.o"
 
 # External object files for target semestralka
 semestralka_EXTERNAL_OBJECTS =
 
-semestralka: CMakeFiles/semestralka.dir/main.cpp.o
+semestralka: CMakeFiles/semestralka.dir/server.cpp.o
+semestralka: CMakeFiles/semestralka.dir/client.cpp.o
+semestralka: CMakeFiles/semestralka.dir/database.cpp.o
 semestralka: CMakeFiles/semestralka.dir/build.make
 semestralka: CMakeFiles/semestralka.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable semestralka"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/tmp/semestralka/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable semestralka"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/semestralka.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
