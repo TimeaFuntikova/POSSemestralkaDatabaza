@@ -132,10 +132,6 @@
 		<Unit filename="/tmp/tmp.OcGwTyYegT/DatabaseLogic.h">
 			<Option target="server"/>
 		</Unit>
-		<Unit filename="/tmp/tmp.OcGwTyYegT/ZapisDoSuboru.h">
-			<Option target="client"/>
-			<Option target="server"/>
-		</Unit>
 		<Unit filename="/tmp/tmp.OcGwTyYegT/client.cpp">
 			<Option target="client"/>
 		</Unit>

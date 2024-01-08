@@ -6,6 +6,20 @@
 
 #IncludeRegexTransform: 
 
+/tmp/tmp.OcGwTyYegT/DatabaseLogic.cpp
+fstream
+-
+iostream
+-
+sstream
+/tmp/tmp.OcGwTyYegT/sstream
+DatabaseLogic.h
+/tmp/tmp.OcGwTyYegT/DatabaseLogic.h
+string
+/tmp/tmp.OcGwTyYegT/string
+ZapisDoSuboru.h
+/tmp/tmp.OcGwTyYegT/ZapisDoSuboru.h
+
 /tmp/tmp.OcGwTyYegT/DatabaseLogic.h
 string
 -
@@ -26,21 +40,11 @@ mutex
 DatabaseLogic.h
 /tmp/tmp.OcGwTyYegT/DatabaseLogic.h
 
-/tmp/tmp.OcGwTyYegT/server.cpp
+/tmp/tmp.OcGwTyYegT/ZapisDoSuboru.h
+string
+-
 iostream
 -
-pthread.h
+cstring
 -
-sys/socket.h
--
-netinet/in.h
--
-unistd.h
--
-sstream
--
-arpa/inet.h
--
-DatabaseLogic.h
-/tmp/tmp.OcGwTyYegT/DatabaseLogic.h
 

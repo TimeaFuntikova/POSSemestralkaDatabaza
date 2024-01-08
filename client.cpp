@@ -42,6 +42,8 @@ int main() {
         char buffer[1024];
         recv(clientSocket, buffer, sizeof(buffer), 0);
         std::cout << "Server response: " << buffer << std::endl;
+
+        //po zadani logout vypnut pripojenie na server - dorobit
     }
     close(clientSocket);
 

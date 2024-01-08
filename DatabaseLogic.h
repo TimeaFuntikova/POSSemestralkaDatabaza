@@ -54,20 +54,28 @@ class DatabaseLogic {
 public:
     DatabaseLogic() = default;
     DatabaseLogic(std::string& tableName,std::string& loggedUser) : tableName(tableName),loggedUser(loggedUser){}
+    DatabaseLogic(std::string& loggedUser) : loggedUser(loggedUser) {}
     bool isDefined();
     bool containsColumn(std::string columnName);
-    bool hasRights();
-    std::string addRights(std::string userName);
+    bool hasRights(std::string neededRights);
+    std::string insert(std::string data);
+    std::string update(std::string primaryKey, std::string data);
+    std::string deleteRow(std::string primaryKey);
+    std::string getRow(std::string primaryKey);
+    std::string getRows();
+    std::string addRights(std::string userName, std::string rights);
+    std::string DeleteTable();
     std::string addColumn(std::string columnName, DataType type);
     std::string loginUser(std::string userName, std::string password);
+    std::string createTable(std::string columns);
     std::string registerUser(std::string userName, std::string password);
-    void createTable(const std::string& tableName);
 
 private:
     std::mutex logMutex;
     bool fileExists(std::string& fileName);
     bool writeCsvFile(std::string fileName, std::string data);
     std::string findUserinCsvFile(std::string fileName, std::string username, std::string password);
+    std::string getCertainCount(std::string fileName, std::string primaryKey);
     int getCount(std::string fileName);
     std::string tableName;
     std::string loggedUser;
