@@ -7,6 +7,8 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <fstream>
+#include <filesystem>
+namespace fs = std::filesystem;
 #include "database.h"
 
 DataType parseDataType(const std::string& typeStr) {
@@ -63,16 +65,47 @@ std::string processRequest(const std::string& request, Database& db, const std::
         } else {
             return "Failed to delete table " + tableName + ".";
         }
-    } else if (command == "ADD_TO") {
-        std::string table, rowData;
-        iss >> table;
-        std::getline(iss, rowData);
-        Row newRow;
-        // ...
-        // db.getTable(table)->addRow(newRow);
-        return "Row added successfully.\n";
+    } else if (command == "GRANT_ACCESS") {
+
+        std::string userWithNewAccess;
+        iss >> userWithNewAccess;
+
+        std::string tableName;
+        iss >> tableName;
+
+
+        //"I" || "U" || "D" || "S"
+        std::string right;
+        iss >>  right;
+        if(db.grantAccess(userWithNewAccess, tableName, right)) return "Access to table " + tableName + " for the user: " + userWithNewAccess + " granted.";
+    }else if(command == "INSERT_INFO") {
+        std::string tableName;
+        iss >> tableName;
+
+        return Database::getHeader("/tmp/semestralka/" + tableName + ".csv");
+    } else if(command == "INSERT") {
+        std::string tableName;
+        iss >> tableName;
+
+        std::string data;
+        iss >> data;
+
+        if(db.insert(data, tableName, username)) return "Row added successfully.\n";
     } else if (command == "GET") {
     } else if (command == "UPDATE") {
+
+        std::string primaryKey;
+        iss >> primaryKey;
+
+        std::string tableName;
+        iss >> tableName;
+
+        std::string data;
+        iss >> data;
+
+        if(db.update(primaryKey, data, tableName, username)) return "Update was successfull";
+
+        return "Update failed.";
     } else if (command == "DELETE") {
     } else if (command == "LIST_MY_TABLES") {
             auto createdTables = db.listTablesCreatedByUser(username);
@@ -154,10 +187,10 @@ void *handleClient(void *clientSocket) {
 
 
 int main() {
-
+    std::cout << fs::current_path();
     Database db;
-    db.loadPermissions();
-    db.loadFromFile();
+
+
 
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -165,7 +198,7 @@ int main() {
         return -1;
     }
 
-    int port = 8081;
+    int port = 8082;
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);

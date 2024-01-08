@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <cstring>
 
-void performDatabaseOperation(int clientSocket, const std::string& request) {
+void performOperation(int clientSocket, const std::string& request) {
     int sendRes = send(clientSocket, request.c_str(), request.size(), 0);
     if (sendRes == -1) {
         std::cerr << "Failed to send request to server." << std::endl;
@@ -43,6 +43,8 @@ void printInstructions() {
     std::cout << "  CREATE_TABLE <tableName> <columnName1:DATA_TYPE:nullable, columnName2:DATA_TYPE:nullable...> - Create a new table" << std::endl;
     std::cout << "  LIST_MY_TABLES - Lists all tables created by the user logged in." << std::endl;
     std::cout << "  DELETE_TABLE <tableName> - Delete a table" << std::endl;
+    std::cout << "  GRANT_ACCESS <tableName> <username> <permission : IUDS> - Grant access to a username to a specific table." << std::endl;
+    std::cout << "  INSERT <tableName> <data1,data2,...> - Insert data into specific table." << std::endl;
     std::cout << "  q - Quit" << std::endl;
 }
 
@@ -55,7 +57,7 @@ int main() {
 
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(8081);
+    serverAddr.sin_port = htons(8082);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
@@ -94,7 +96,7 @@ int main() {
             break;
         }
 
-        performDatabaseOperation(clientSocket, userInput);
+        performOperation(clientSocket, userInput);
     }
 
     // Close the socket

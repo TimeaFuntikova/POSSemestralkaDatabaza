@@ -3,6 +3,9 @@
 #include <iostream>
 #import <sstream>
 #include <memory>
+#include <filesystem>
+#include <utility>
+namespace fs = std::filesystem;
 
 void Database::saveTableCreatorInfo() {
     std::ofstream file("table_creators.csv");
@@ -53,52 +56,47 @@ std::vector<std::string> Database::listTablesCreatedByUser(const std::string& us
     return createdTables;
 }
 
+//rights: O as owner, IUDSV - insert update delete, I - only inserting, U - only updating, D - only deleting, S -selecting only
+bool Database::hasRights(std::string user, std::string neededRights, std::string tableName)
+{
+    std::ifstream table("/tmp/semestralka/" + tableName + "_rights.csv");
+    std::string line;
+    while (getline(table, line)) {
+        std::istringstream iss(line);
+        std::string username, rights;
+        if (std::getline(iss, username, ',') && std::getline(iss, rights)) {
+            if (username == user && neededRights == rights) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool Database::deleteTable(const std::string& username, const std::string& tableName) {
     std::lock_guard<std::mutex> lock(dbMutex);
 
-    auto it = tables.find(tableName);
-    if (it != tables.end() && it->second->getCreator() == username) {
-        std::string filePath = tableName + ".csv";
-        if (remove(filePath.c_str()) != 0) {
-            std::cerr << "Error deleting file: " << filePath << std::endl;
-        } else {
-            std::cout << "File deleted successfully: " << filePath << std::endl;
-        }
+    if (hasRights(username, "O", tableName)) {
 
-        tables.erase(it);
-        saveTableCreatorInfo();
+            std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
 
-        return true;
+            if (remove(filePath.c_str()) != 0) {
+                std::cerr << "Error deleting file: " << filePath << std::endl;
+            } else {
+                std::cout << "File deleted successfully: " << filePath << std::endl;
+            }
+            std::string fileRightsPath = "/tmp/semestralka/" + tableName + "_rights.csv";
+
+            if (remove(fileRightsPath.c_str()) != 0) {
+                std::cerr << "Error deleting file: " << fileRightsPath << std::endl;
+            } else {
+                std::cout << "File deleted successfully: " << fileRightsPath << std::endl;
+            }
     } else {
-        std::cerr << "Table " << tableName << " not found or permission denied." << std::endl;
-        return false;
-    }
-}
-
-void Database::loadPermissions() {
-    std::ifstream file("permissions.csv");
-    std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream ss(line);
-        std::string username, tableName;
-        std::getline(ss, username, ',');
-        User user{username, {}};
-        while (std::getline(ss, tableName, ',')) {
-            user.permissions.insert(tableName);
+            std::cerr << "Table " << tableName << " not found or permission denied." << std::endl;
+            return false;
         }
-        users[username] = user;
-    }
-}
-
-void Database::savePermissions() {
-    std::ofstream file("permissions.csv");
-    for (const auto& [username, user] : users) {
-        file << username;
-        for (const auto& tableName : user.permissions) {
-            file << "," << tableName;
-        }
-        file << std::endl;
-    }
+    return true;
 }
 
 bool Table::addRow(const Row& row) {
@@ -165,10 +163,10 @@ bool writeCsvFile(filename &fileName, T1 column1, T2 column2, T3 column3) {
     std::fstream file;
     file.open (fileName, std::ios::out | std::ios::app);
     if (file) {
-        file << "\"" << column1 << "\",";
-        file << "\"" << column2 << "\",";
-        file << "\"" << column3 << "\"";
-        file <<  std::endl;
+        file << column1 << ",";
+        file << column2 << ",";
+        file << column3 << ",";
+        file << std::endl;
         return true;
     } else {
         return false;
@@ -176,19 +174,47 @@ bool writeCsvFile(filename &fileName, T1 column1, T2 column2, T3 column3) {
 }
 
 void Database::saveTableStructure(const Table& table) {
-    std::string csvFile = table.getName() + ".csv";
-    if(!fileExists(csvFile))
-    {
-        writeCsvFile(csvFile, "columnName", "columnType", "isNullable");
+    //VYTVORENIE TABULKY
+    std::string csvFile = "/tmp/semestralka/" + table.getName() + ".csv";
+
+    std::string header = "id,";
+    for (const auto& column : table.getColumns()) {
+        header+= column.name;
     }
 
-    for (const auto& column : table.getColumns()) {
-        std::cout << "Writing column to file: " << column.name << " of type " << dataTypeToString(column.type) << " nullable: " << (column.isNullable ? "true" : "false") << std::endl;
-        if(!writeCsvFile(csvFile, column.name, dataTypeToString(column.type), (column.isNullable ? "true" : "false") )) {
-            std::cerr << "Failed to write to file for table " << csvFile << std::endl;
+    std::string trimmedHeader = header.substr(0, header.size() -1);
+    std::fstream file;
+    if(file) {
+        file.open(csvFile, std::ios::out | std::ios::app);
+        if (file) {
+            file << trimmedHeader;
+            file << std::endl;
         }
+        std::cout << "Created header for the table " << table.getName() << std::endl;
+        file.close();
     }
-        std::cout << "Table structure written successfully for table " << table.getName() << std::endl;
+
+    //VYTVORENIE PRAV PRE TABULKU
+    std::string rightsFile = "/tmp/semestralka/" + table.getName() + "_rights.csv";
+
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    if(file) {
+        file.open(rightsFile, std::ios::out | std::ios::app);
+        if (file) {
+            file << table.getCreator() << "," << "O";
+            file << std::endl;
+        }
+        std::cout << "Assigned rights for the table " << table.getName() << std::endl;
+        file.close();
+    }
+
+    fs::permissions(csvFile,
+                    fs::perms::all);
+
+
+    fs::permissions(rightsFile,
+                    fs::perms::all);
+    std::cout << "Table structure written successfully for table " << table.getName() << std::endl;
 }
 
 void Database::createTable(const std::string& tableName, const std::vector<Column>& columns, const std::string& creatorUsername) {
@@ -208,25 +234,37 @@ void Database::createTable(const std::string& tableName, const std::vector<Colum
     }
 }
 
-
-bool Database::hasPermission(const std::string& username, const std::string& tableName) {
-    std::lock_guard<std::mutex> lock(dbMutex);
-    auto userIt = users.find(username);
-    if (userIt != users.end()) {
-        return userIt->second.permissions.find(tableName) != userIt->second.permissions.end();
-    }
-    return false;
-}
-
 /**
  * Funkcia na update práv, ako keď  sa pridá nový používateľ alebo keď
  * už existujúci udelí práva inému používateľovi
  * @param username
  * @param tableName
  */
-void Database::grantAccess(const std::string& username, const std::string& tableName) {
+
+bool Database::grantAccess(const std::string& username, const std::string& tableName, std::string& right) {
     users[username].permissions.insert(tableName);
-    savePermissions(); // Save the updated permissions to file
+
+    std::string rightsFile = "/tmp/semestralka/" + tableName + "_rights.csv";
+
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    std::fstream file;
+    if(file) {
+        file.open(rightsFile, std::ios::out | std::ios::app);
+        if (file) {
+            file << username << "," << right << "\n";
+            file << std::endl;
+        }
+        std::cout << "Assigned rights for the table " << tableName << "to user: "<< username << std::endl;
+        file.close();
+
+        fs::permissions(rightsFile,
+                        fs::perms::all);
+
+
+        return true;
+    }
+    return false;
+
 }
 
 //todo: funkcia na sort
@@ -239,22 +277,6 @@ std::optional<Table*> Database::getTable(const std::string& tableName) {
         return it->second.get();
     }
     return std::nullopt;
-}
-
-void Database::loadFromFile() {
-    std::lock_guard<std::mutex> lock(dbMutex);
-    std::ifstream tablesFile("tables.csv");
-    std::string line;
-    while (std::getline(tablesFile, line)) {
-        std::istringstream ss(line);
-        std::string tableName, creator;
-        std::getline(ss, tableName, ',');
-        std::getline(ss, creator);
-        auto table = std::make_unique<Table>(tableName);
-        table->setCreator(creator);
-        tables[tableName] = std::move(table);
-    }
-    tablesFile.close();
 }
 
 bool Database::isUserRegistered(const std::string& username) {
@@ -291,6 +313,53 @@ void Database::registerUser(const std::string& username, const std::string& pass
     file.close();
 }
 
+bool Database::insert(std::string data, std::string tableName,  std::string user) {
+    if (hasRights(user, "IUDS", tableName)
+        || hasRights(user, "I", tableName)
+        || hasRights(user, "O", tableName)) {
+        int count = getCount("/tmp/semestralka/" + tableName + ".csv");
+        std::stringstream dataStream;
+        dataStream << count;
+        std::string datas;
+        dataStream >> datas;
+        datas += "," + data + "\n";
+        std::string tblName = "/tmp/semestralka/" + tableName + ".csv";
+
+        std::fstream file;
+        if (file) {
+            file.open(tblName, std::ios::out | std::ios::app);
+            if (file) {
+                file << datas;
+            }
+
+            std::cout << "User " + user + " has inserted data " + data + " into " + tableName << std::endl;
+            file.close();
+            return true;
+        }
+    }
+    else {
+        return false;
+    }
+}
+
+std::string Database::getHeader(std::string fileName) {
+    std::ifstream ip(fileName);
+    std::string line;
+    std::getline(ip, line);
+    return line;
+}
+
+int Database::getCount(std::string fileName)
+{
+    std::ifstream ip(fileName);
+    std::string line;
+    int count = 0;
+    while (std::getline(ip, line)) {
+        count++;
+    }
+    return count - 1;
+}
+
 bool Database::validateUserPassword(const std::string& username, const std::string& password) {
     std::ifstream file("users.csv");
     std::string line;
@@ -305,5 +374,36 @@ bool Database::validateUserPassword(const std::string& username, const std::stri
     }
     return false;
 }
+bool Database::update(std::string primaryKey, std::string data, std::string tableName, std::string user)
+{
+    if (hasRights(user, "IUDS", tableName) ||
+        hasRights(user, "U", tableName) || hasRights(user, "O", tableName)) {
+        std::string tblName = "/tmp/semestralka/" + tableName + ".csv";
+        std::ifstream file("/tmp/semestralka/" + tableName + ".csv");
+        std::string line;
+        std::string dataToUpdate;
+        while (getline(file, line)) {
+            std::string id;
+            std::istringstream iss(line);
+            std::getline(iss, id, ',');
+            if (id == primaryKey) {
+                dataToUpdate = id + "," + data + "\n";
+            }
+            else {
+                dataToUpdate += line;
+            }
+        }
+        if (file) {
+            file.open(tblName, std::ios::out | std::ios::app);
+            if (file) {
+                file << dataToUpdate;
+            }
 
+            std::cout << "User " + user + " has updated data " + data + " into " + tableName << std::endl;
+            file.close();
+            return true;
+        }
+    }
+    return false
+}
 

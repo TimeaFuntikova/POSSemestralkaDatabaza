@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <string>
+#include <cstring>
 #include <utility>
 #include <vector>
 #include <map>
@@ -44,11 +45,6 @@ public:
         this->creator = creatorUsername;
     }
 
-    bool addRow(const Row& row);
-    std::optional<Row> getRow(const std::string& primaryKey);
-    bool updateRow(const std::string& primaryKey, const Row& newRow);
-    bool deleteRow(const std::string& primaryKey);
-
 private:
     std::string name;
     std::string creator;
@@ -63,28 +59,29 @@ public:
     std::optional<Table*> getTable(const std::string& tableName);
     static void saveTableStructure(const Table& table);
     std::vector<std::string> listTablesCreatedByUser(const std::string& username);
+    bool deleteTable(const std::string& username, const std::string& tableName);
+
+    bool hasRights(std::string user, std::string neededRights, std::string tableName);
+    bool grantAccess(const std::string& username, const std::string& tableName, std::string& right);
 
     static bool isUserRegistered(const std::string& username);
     static void registerUser(const std::string& username, const std::string& password);
-    static bool validateUserPassword(const std::string& username, const std::string& password);
-
-    void savePermissions();
-    void loadPermissions();
 
     void saveTableCreatorInfo();
     void loadTableCreatorInfo();
 
-    bool deleteTable(const std::string& username, const std::string& tableName);
+    bool insert(std::string data, std::string tableName, std::string user);
+    bool update(std::string primaryKey, std::string data, std::string tableName, std::string user)
 
-    bool hasPermission(const std::string& username, const std::string& tableName);
-    void grantAccess(const std::string& username, const std::string& tableName);
-
-    void loadFromFile();
+    static bool validateUserPassword(const std::string& username, const std::string& password);
+    static std::string getHeader(std::string fileName);
 
 private:
     std::map<std::string, std::unique_ptr<Table>> tables;
     std::mutex dbMutex;
     std::map<std::string, User> users;
+
+    int getCount(std::string fileName);
 
 
 };
