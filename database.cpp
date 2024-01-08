@@ -191,7 +191,6 @@ bool Database::grantAccess(const std::string& username, const std::string& table
     return false;
 }
 
-
 bool Database::insert(std::string data, std::string tableName,  std::string user) {
     if (hasRights(user, "IUDS", tableName)
         || hasRights(user, "I", tableName)
