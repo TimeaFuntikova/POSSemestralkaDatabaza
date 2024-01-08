@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sstream>
 #include <arpa/inet.h>
+#include <string>
 #include <cstring>
 #include <fstream>
 #include <filesystem>
@@ -56,6 +57,13 @@ std::string processRequest(const std::string& request, Database& db, const std::
 
         return "Table " + tableName + " created successfully.";
 
+    } else if(command == "LOGIN") {
+
+        std::string password;
+        iss >> password;
+
+        return db.loginUser(username,password);
+
     } else if (command == "DELETE_TABLE") {
         std::string tableName;
         iss >> tableName;
@@ -72,7 +80,6 @@ std::string processRequest(const std::string& request, Database& db, const std::
 
         std::string tableName;
         iss >> tableName;
-
 
         //"I" || "U" || "D" || "S"
         std::string right;
@@ -103,10 +110,18 @@ std::string processRequest(const std::string& request, Database& db, const std::
         std::string data;
         iss >> data;
 
-        if(db.update(primaryKey, data, tableName, username)) return "Update was successfull";
+        if(db.update(primaryKey, data, tableName, username)) return "Update was successful";
 
         return "Update failed.";
+
     } else if (command == "DELETE") {
+        std::string primaryKey;
+        iss >> primaryKey;
+
+        std::string tableName;
+        iss >> tableName;
+
+        if(db.deleteRow(primaryKey, username, tableName)) return "Delete successful.";
     } else if (command == "LIST_MY_TABLES") {
             auto createdTables = db.listTablesCreatedByUser(username);
             std::stringstream response;
@@ -115,59 +130,82 @@ std::string processRequest(const std::string& request, Database& db, const std::
             }
             return response.str().empty() ? "No tables created." : response.str();
         }
+    else if(command == "GET_ROWS") {
+        std::string tableName;
+        iss >> tableName;
+
+        return db.getRows(username, tableName);
+    }
+    else if(command == "GET_ROW") {
+        std::string primaryKey;
+        iss >> primaryKey;
+
+        std::string tableName;
+        iss >> tableName;
+
+        return db.getRow(primaryKey, username, tableName);
+    }
     return "Unknown command.\n";
 }
 
 void *handleClient(void *clientSocket) {
-    int socket = *((int*)clientSocket);
+    int socket = *((int *) clientSocket);
     free(clientSocket);
 
     char buffer[4096];
     std::string username;
 
     // Receive username from client
-    recv(socket, buffer, sizeof(buffer), 0);
+    int bytesReceived = recv(socket, buffer, sizeof(buffer) - 1, 0);
+    if (bytesReceived <= 0) {
+        std::string message= "Error while receiving username from the client";
+        send(socket, message.c_str(), message.size(), 0);
+        close(socket);
+        return nullptr;
+    }
     username.assign(buffer);
     std::memset(buffer, 0, sizeof(buffer));
 
     Database db;
 
-    if (Database::isUserRegistered(username)) {
-        std::cout << "User " << username << " is registered." << std::endl;
-        send(socket, "Enter password", 14, 0);
+    std::string fileName = "/tmp/semestralka/Users_table.csv";
+    std::string userFound = Database::findUserinCsvFile(fileName, username);
 
-        // Receive password from client
-        recv(socket, buffer, sizeof(buffer), 0);
-        std::string password(buffer);
-
-        if (Database::validateUserPassword(username, password)) {
-            std::string successMsg = "Login successful";
-            send(socket, successMsg.c_str(), successMsg.length(), 0);
-        } else {
-            std::string notSuccessMsg = "Incorrect password";
-            send(socket, notSuccessMsg.c_str(), notSuccessMsg.length(), 0);
-
-            close(socket);
-            return nullptr;
-        }
+    std::string responseMsg;
+    if (username == userFound) {
+        std::cout << "User " << username << " is registered.\n" << std::endl;
+        responseMsg = "Enter password: ";
     } else {
-        std::cout << "User " << username << " is not registered." << std::endl;
-        send(socket, "Create new password", 19, 0);
-
-        // Receive new password from client
-        recv(socket, buffer, sizeof(buffer), 0);
-        std::string newPassword(buffer);
-
-        Database::registerUser(username, newPassword);
-        send(socket, "User registered successfully", 29, 0);
+        std::cout << "User " << username << " is not registered.\n" << std::endl;
+        responseMsg = "Create password: ";
     }
+    send(socket, responseMsg.c_str(), responseMsg.size(), 0);
+    std::cout << "Sent message to client.\n" << std::endl;
 
+
+    recv(socket, buffer, sizeof(buffer) - 1, 0);
+    std::cout << "Received: " << buffer << std::endl;
+
+    std::string newPassword;
+    newPassword.assign(buffer);
+    std::cout << newPassword;
+    std::memset(buffer, 0, sizeof(buffer));
+
+
+        if(username != userFound) {
+            std::cout << "Trying to register the user:" << std::endl;
+
+            if (db.registerUser(username, newPassword)) send(socket, "User registered successfully", 29, 0);
+        } else {
+            std::string mess = "Logged In.";
+            send(socket, mess.c_str(), mess.size(), 0);
+        }
     bool isRunning = true;
     while (isRunning) {
         std::memset(buffer, 0, sizeof(buffer));
-        int bytesReceived = recv(socket, buffer, sizeof(buffer), 0);
+        bytesReceived = recv(socket, buffer, sizeof(buffer), 0);
         if (bytesReceived <= 0) {
-            isRunning = false;  // Client disconnected or error occurred
+            isRunning = false;
             break;
         }
 
@@ -185,12 +223,9 @@ void *handleClient(void *clientSocket) {
     return nullptr;
 }
 
-
 int main() {
     std::cout << fs::current_path();
     Database db;
-
-
 
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
@@ -198,7 +233,7 @@ int main() {
         return -1;
     }
 
-    int port = 8082;
+    int port = 8080;
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
@@ -214,7 +249,7 @@ int main() {
         return -3;
     }
 
-    std::cout << "Server started. Listening on port 8080..." << std::endl;
+    std::cout << "Server started. Listening on port" << port << "..." << std::endl;
 
     while (true) {
         struct sockaddr_in clientAddr{};

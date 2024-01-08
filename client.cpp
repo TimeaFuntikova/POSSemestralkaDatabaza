@@ -24,6 +24,7 @@ void performOperation(int clientSocket, const std::string& request) {
     }
 }
 
+
 std::string getUsername() {
     std::string username;
     std::cout << "Enter your username: ";
@@ -45,6 +46,10 @@ void printInstructions() {
     std::cout << "  DELETE_TABLE <tableName> - Delete a table" << std::endl;
     std::cout << "  GRANT_ACCESS <tableName> <username> <permission : IUDS> - Grant access to a username to a specific table." << std::endl;
     std::cout << "  INSERT <tableName> <data1,data2,...> - Insert data into specific table." << std::endl;
+    std::cout << "  UPDATE <primaryKey> <tableName> <data1,data2,...> - Insert data into specific table." << std::endl;
+    std::cout << "  DELETE <primaryKey> <tableName> - Delete data from specific table." << std::endl;
+    std::cout << "  GET_ROWS <tableName> - Returns all rows from the selected table." << std::endl;
+    std::cout << "  GET_ROW <primaryKey> <tableName> - Returns a row from the selected table according the primary key provided." << std::endl;
     std::cout << "  q - Quit" << std::endl;
 }
 
@@ -57,7 +62,7 @@ int main() {
 
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(8082);
+    serverAddr.sin_port = htons(8080);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
@@ -66,6 +71,8 @@ int main() {
         return -2;
     }
 
+    std::cout << "LOGIN or REGISTER\n";
+
     std::string username = getUsername();
     send(clientSocket, username.c_str(), username.size(), 0);
 
@@ -73,18 +80,17 @@ int main() {
     recv(clientSocket, serverResponse, sizeof(serverResponse), 0);
     std::string response(serverResponse);
     std::cout << response << std::endl;
+    std::memset(serverResponse, 0, sizeof(serverResponse));
 
-    // Check server's response for password entry or new password creation
-    if (response.find("Enter password") != std::string::npos ||
-        response.find("Create new password") != std::string::npos) {
+    std::string password = getPassword();
+    send(clientSocket, password.c_str(), password.size(), 0);
+    std::cout << "Sent message to server with:" << password.c_str() << std::endl;
 
-        std::string password = getPassword();
-        send(clientSocket, password.c_str(), password.size(), 0);
 
-        // Receive response after sending password
-        recv(clientSocket, serverResponse, sizeof(serverResponse), 0);
-        std::cout << serverResponse << std::endl;
-    }
+    // Receive response after sending password
+    std::cout << "Waiting for server..." << std::endl;
+    recv(clientSocket, serverResponse, sizeof(serverResponse), 0);
+    std::cout << serverResponse << std::endl;
 
     printInstructions();
     std::string userInput;
@@ -99,8 +105,6 @@ int main() {
         performOperation(clientSocket, userInput);
     }
 
-    // Close the socket
     close(clientSocket);
     return 0;
 }
-
