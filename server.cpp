@@ -75,16 +75,19 @@ std::string processRequest(const std::string& request, Database& db, const std::
         }
     } else if (command == "GRANT_ACCESS") {
 
-        std::string userWithNewAccess;
-        iss >> userWithNewAccess;
-
         std::string tableName;
         iss >> tableName;
+
+        std::string userWithNewAccess;
+        iss >> userWithNewAccess;
 
         //"I" || "U" || "D" || "S"
         std::string right;
         iss >>  right;
-        if(db.grantAccess(userWithNewAccess, tableName, right)) return "Access to table " + tableName + " for the user: " + userWithNewAccess + " granted.";
+        if(db.grantAccess(userWithNewAccess, tableName, right))
+        {
+            return "Access to table " + tableName + " for the user: " + userWithNewAccess + " granted.";
+        }
     }else if(command == "INSERT_INFO") {
         std::string tableName;
         iss >> tableName;
@@ -189,13 +192,13 @@ void *handleClient(void *clientSocket) {
     std::string newPassword;
     newPassword.assign(buffer);
     std::cout << newPassword;
-    std::memset(buffer, 0, sizeof(buffer));
 
 
         if(username != userFound) {
             std::cout << "Trying to register the user:" << std::endl;
-
-            if (db.registerUser(username, newPassword)) send(socket, "User registered successfully", 29, 0);
+            if (!db.registerUser(username, newPassword)) {
+                send(socket, "User registered successfully", 29, 0);
+            }
         } else {
             std::string mess = "Logged In.";
             send(socket, mess.c_str(), mess.size(), 0);
@@ -233,7 +236,7 @@ int main() {
         return -1;
     }
 
-    int port = 8080;
+    int port = 8082;
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
@@ -249,7 +252,7 @@ int main() {
         return -3;
     }
 
-    std::cout << "Server started. Listening on port" << port << "..." << std::endl;
+    std::cout << "Server started. Listening on port " << port << "..." << std::endl;
 
     while (true) {
         struct sockaddr_in clientAddr{};

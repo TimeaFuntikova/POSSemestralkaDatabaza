@@ -169,8 +169,6 @@ void Database::createTable(const std::string& tableName, const std::vector<Colum
  */
 
 bool Database::grantAccess(const std::string& username, const std::string& tableName, std::string& right) {
-    users[username].permissions.insert(tableName);
-
     std::string rightsFile = "/tmp/semestralka/" + tableName + "_rights.csv";
 
     std::lock_guard<std::mutex> csvLock(logMutex);
@@ -191,34 +189,32 @@ bool Database::grantAccess(const std::string& username, const std::string& table
     return false;
 }
 
-bool Database::insert(std::string data, std::string tableName,  std::string user) {
-    if (hasRights(user, "IUDS", tableName)
-        || hasRights(user, "I", tableName)
-        || hasRights(user, "O", tableName)) {
-        int count = getCount("/tmp/semestralka/" + tableName + ".csv");
-        std::stringstream dataStream;
-        dataStream << count;
-        std::string datas;
-        dataStream >> datas;
-        datas += "," + data + "\n";
-        std::string tblName = "/tmp/semestralka/" + tableName + ".csv";
-
-        std::fstream file;
-        if (file) {
-            file.open(tblName, std::ios::out | std::ios::app);
-            if (file) {
-                file << datas << "\n";
-            }
-
-            std::cout << "User " + user + " has inserted data " + data + " into " + tableName << std::endl;
-            file.close();
-            return true;
-        }
-    }
-    else {
+bool Database::insert(std::string data, std::string tableName, std::string user) {
+    if (!hasRights(user, "IUDS", tableName) &&
+        !hasRights(user, "I", tableName) &&
+        !hasRights(user, "O", tableName)) {
         return false;
     }
+
+    std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
+    std::fstream file(filePath, std::ios::in | std::ios::out | std::ios::app);
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filePath << std::endl;
+        return false;
+    }
+
+    int nextId = getCount(filePath);
+    std::string lineToInsert = std::to_string(nextId) + "," + data + "\n";
+
+    file.seekp(0, std::ios::end);
+    file << lineToInsert;
+
+    std::cout << "User " + user + " has inserted data " + data + " into " + tableName << std::endl;
+    file.close();
+    return true;
 }
+
 
 std::string Database::getHeader(std::string fileName) {
     std::ifstream ip(fileName);
@@ -229,7 +225,7 @@ std::string Database::getHeader(std::string fileName) {
 
 int Database::getCount(std::string fileName)
 {
-    std::ifstream ip(fileName);
+    std::fstream ip(fileName);
     std::string line;
     int count = 0;
     while (std::getline(ip, line)) {
@@ -238,37 +234,54 @@ int Database::getCount(std::string fileName)
     return count - 1;
 }
 
-bool Database::update(std::string primaryKey, std::string data, std::string tableName, std::string user)
-{
-    if (hasRights(user, "IUDS", tableName) ||
-        hasRights(user, "U", tableName) || hasRights(user, "O", tableName)) {
-        std::string tblName = "/tmp/semestralka/" + tableName + ".csv";
-        std::fstream file("/tmp/semestralka/" + tableName + ".csv");
-        std::string line;
-        std::string dataToUpdate;
-        while (getline(file, line)) {
-            std::string id;
-            std::istringstream iss(line);
-            std::getline(iss, id, ',');
-            if (id == primaryKey) {
-                dataToUpdate = id + "," + data + "\n";
-            }
-            else {
-                dataToUpdate += line;
-            }
-        }
-        if (file) {
-            file.open(tblName, std::ios::out | std::ios::app);
-            if (file) {
-                file << dataToUpdate << "\n";
-            }
+bool Database::update(std::string primaryKey, std::string data, std::string tableName, std::string user) {
+    if (!hasRights(user, "IUDS", tableName) &&
+        !hasRights(user, "U", tableName) &&
+        !hasRights(user, "O", tableName)) {
+        return false;
+    }
 
-            std::cout << "User " + user + " has updated data " + data + " into " + tableName << std::endl;
-            file.close();
-            return true;
+    std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
+    std::fstream file(filePath);
+    std::string line;
+    std::string header;
+    std::stringstream updatedContent;
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filePath << std::endl;
+        return false;
+    }
+
+    //skipping header
+    if (!getline(file, header)) {
+        std::cerr << "Failed to read header from file: " << filePath << std::endl;
+        return false;
+    }
+    updatedContent << header << "\n";
+
+    bool updateSuccess = false;
+    while (getline(file, line)) {
+        std::istringstream iss(line);
+        std::string id;
+        getline(iss, id, ',');
+        if (id == primaryKey) {
+            updatedContent << id << "," << data << "\n";
+            updateSuccess = true;
+        } else {
+            updatedContent << line << "\n";
         }
     }
-    return false;
+    file.close();
+
+    std::ofstream outFile(filePath);
+    if (!outFile.is_open()) {
+        std::cerr << "Failed to open file for writing: " << filePath << std::endl;
+        return false;
+    }
+    outFile << updatedContent.str();
+    outFile.close();
+
+    return updateSuccess;
 }
 
 bool Database::addColumn(std::string columnName, std::string user, std::string tableName)
@@ -305,9 +318,7 @@ bool Database::addColumn(std::string columnName, std::string user, std::string t
             return true;
         }
     }
-    else {
         return false;
-    }
 }
 std::string Database::findUserinCsvFile(std::string fileName, std::string username)
 {
@@ -430,31 +441,52 @@ std::string Database::getRows(std::string user, std::string tableName)
         return "User " + user + " has no right to select items from " + tableName;
     }
 }
-bool Database::deleteRow(std::string primaryKey,std::string user,std::string tableName)
-{
-    if (hasRights(user, "IUDS", tableName) || hasRights(user, "D", tableName) || hasRights(user, "O", tableName)) {
-        std::string tblName = "/tmp/semestralka/" + tableName + ".csv";
-        std::fstream file("/tmp/semestralka/" + tableName + ".csv");
-        std::string line;
-        std::string data;
-        while (getline(file, line)) {
-            std::string id;
-            std::istringstream iss(line);
-            std::getline(iss, id, ',');
-            if (id != primaryKey) {
-                data += line;
-            }
-        }
-        if (file) {
-            file.open(tblName);
-            if (file) {
-                file << data;
-            }
 
-            std::cout << "User " + user + " has deleted row in table " + tableName << std::endl;
-            file.close();
-            return true;
+bool Database::deleteRow(std::string primaryKey, std::string user, std::string tableName) {
+    if (!hasRights(user, "IUDS", tableName) &&
+        !hasRights(user, "D", tableName) &&
+        !hasRights(user, "O", tableName)) {
+        return false;
+    }
+
+    std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
+    std::fstream file(filePath);
+    std::string line, header;
+    std::stringstream updatedContent;
+
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filePath << std::endl;
+        return false;
+    }
+
+    // skip header
+    if (!getline(file, header)) {
+        std::cerr << "Failed to read header from file: " << filePath << std::endl;
+        return false;
+    }
+    updatedContent << header << "\n";
+
+    bool deleteSuccess = false;
+    while (getline(file, line)) {
+        std::istringstream iss(line);
+        std::string id;
+        getline(iss, id, ',');
+        if (id != primaryKey) {
+            updatedContent << line << "\n";
+        } else {
+            deleteSuccess = true;
         }
     }
-    return false;
+    file.close();
+
+    std::ofstream outFile(filePath);
+    if (!outFile.is_open()) {
+        std::cerr << "Failed to open file for writing: " << filePath << std::endl;
+        return false;
+    }
+    outFile << updatedContent.str();
+    outFile.close();
+
+    return deleteSuccess;
 }
+

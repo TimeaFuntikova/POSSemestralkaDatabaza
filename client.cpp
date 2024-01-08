@@ -44,7 +44,7 @@ void printInstructions() {
     std::cout << "  CREATE_TABLE <tableName> <columnName1:DATA_TYPE:nullable, columnName2:DATA_TYPE:nullable...> - Create a new table" << std::endl;
     std::cout << "  LIST_MY_TABLES - Lists all tables created by the user logged in." << std::endl;
     std::cout << "  DELETE_TABLE <tableName> - Delete a table" << std::endl;
-    std::cout << "  GRANT_ACCESS <tableName> <username> <permission : IUDS> - Grant access to a username to a specific table." << std::endl;
+    std::cout << "  GRANT_ACCESS <tableName> <username> <permission : IUDS> - Grant access to a user for a specific table." << std::endl;
     std::cout << "  INSERT <tableName> <data1,data2,...> - Insert data into specific table." << std::endl;
     std::cout << "  UPDATE <primaryKey> <tableName> <data1,data2,...> - Insert data into specific table." << std::endl;
     std::cout << "  DELETE <primaryKey> <tableName> - Delete data from specific table." << std::endl;
@@ -62,7 +62,7 @@ int main() {
 
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(8080);
+    serverAddr.sin_port = htons(8082);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
