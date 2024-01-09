@@ -5,6 +5,7 @@
 #include <memory>
 #include <filesystem>
 #include <utility>
+
 namespace fs = std::filesystem;
 
 void Database::saveTableCreatorInfo() {
@@ -41,7 +42,6 @@ void Database::loadTableCreatorInfo() {
     }
 }
 
-
 std::vector<std::string> Database::listTablesCreatedByUser(const std::string& username) {
     std::lock_guard<std::mutex> lock(dbMutex);
 
@@ -75,8 +75,8 @@ bool Database::hasRights(std::string user, std::string neededRights, std::string
 
 bool Database::deleteTable(const std::string& username, const std::string& tableName) {
     std::lock_guard<std::mutex> lock(dbMutex);
-
-    if (hasRights(username, "O", tableName)) {
+    {
+        if (hasRights(username, "O", tableName)) {
 
             std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
 
@@ -92,60 +92,73 @@ bool Database::deleteTable(const std::string& username, const std::string& table
             } else {
                 std::cout << "File deleted successfully: " << fileRightsPath << std::endl;
             }
-    } else {
+        } else {
             std::cerr << "Table " << tableName << " not found or permission denied." << std::endl;
             return false;
         }
-    return true;
+        return true;
+    }
 }
 std::mutex logMutex;
 
 void Database::saveTableStructure(const Table& table) {
-    //VYTVORENIE TABULKY
-    std::string csvFile = "/tmp/semestralka/" + table.getName() + ".csv";
+    std::lock_guard<std::mutex> guard(dbMutex);
 
-    std::string header = "id,";
-    for (const auto& column : table.getColumns()) {
-        header+= column.name;
-    }
+    {
+        //VYTVORENIE TABULKY
+        std::string csvFile = "/tmp/semestralka/" + table.getName() + ".csv";
 
-    std::string trimmedHeader = header.substr(0, header.size() -1);
-    std::fstream file;
-    if(file) {
-        file.open(csvFile, std::ios::out | std::ios::app);
-        if (file) {
-            file << trimmedHeader;
-            file << std::endl;
+        std::string header = "id,";
+        for (const auto &column: table.getColumns()) {
+            header += column.name;
         }
-        std::cout << "Created header for the table " << table.getName() << std::endl;
-        file.close();
-    }
 
-    //VYTVORENIE PRAV PRE TABULKU
-    std::string rightsFile = "/tmp/semestralka/" + table.getName() + "_rights.csv";
-
-    std::lock_guard<std::mutex> csvLock(logMutex);
-    if(file) {
-        file.open(rightsFile, std::ios::out | std::ios::app);
+        std::string trimmedHeader = header.substr(0, header.size() - 1);
+        std::fstream file;
         if (file) {
-            file << table.getCreator() << "," << "O";
-            file << std::endl;
+            file.open(csvFile, std::ios::out | std::ios::app);
+            if (file) {
+                file << trimmedHeader;
+                file << std::endl;
+            }
+            std::cout << "Created header for the table " << table.getName() << std::endl;
+            file.close();
         }
-        std::cout << "Assigned rights for the table " << table.getName() << std::endl;
-        file.close();
+
+
+        //VYTVORENIE PRAV PRE TABULKU
+        std::string rightsFile = "/tmp/semestralka/" + table.getName() + "_rights.csv";
+
+        std::lock_guard<std::mutex> csvLock(logMutex);
+        if (file) {
+            file.open(rightsFile, std::ios::out | std::ios::app);
+            if (file) {
+                file << table.getCreator() << "," << "O";
+                file << std::endl;
+            }
+            std::cout << "Assigned rights for the table " << table.getName() << std::endl;
+            file.close();
+        }
+
+        fs::permissions(csvFile,
+                        fs::perms::all);
+
+
+        fs::permissions(rightsFile,
+                        fs::perms::all);
     }
-
-    fs::permissions(csvFile,
-                    fs::perms::all);
-
-
-    fs::permissions(rightsFile,
-                    fs::perms::all);
     std::cout << "Table structure written successfully for table " << table.getName() << std::endl;
 }
 
+/**
+ * Funkcia na vytvorenie tabuľky, spracuje stĺpce a zavolá funkciu na vytovrenie csv súboru
+ * z výslednej štruktury.
+ * @param tableName
+ * @param columns
+ * @param creatorUsername
+ */
 void Database::createTable(const std::string& tableName, const std::vector<Column>& columns, const std::string& creatorUsername) {
-    std::lock_guard<std::mutex> lock(dbMutex);
+
     if (tables.find(tableName) == tables.end()) {
         auto newTable = std::make_unique<Table>(tableName);
         newTable->setCreator(creatorUsername);
@@ -163,31 +176,35 @@ void Database::createTable(const std::string& tableName, const std::vector<Colum
 
 /**
  * Funkcia na update práv, ako keď  sa pridá nový používateľ alebo keď
- * už existujúci udelí práva inému používateľovi
+ * už existujúci udelí práva inému používateľovi. Uzamkne kritickú sekciu pri zápise do súboru.
  * @param username
  * @param tableName
  */
-
 bool Database::grantAccess(const std::string& username, const std::string& tableName, std::string& right) {
     std::string rightsFile = "/tmp/semestralka/" + tableName + "_rights.csv";
 
     std::lock_guard<std::mutex> csvLock(logMutex);
-    std::fstream file;
-    if(file) {
+    {
+        std::fstream file;
         file.open(rightsFile, std::ios::out | std::ios::app);
-        if (file) {
-            file << username << "," << right << "\n";
-            file << std::endl;
+        if (!file.is_open()) {
+            std::cerr << "Failed to open file: " << rightsFile << std::endl;
+            return false;
         }
-        std::cout << "Assigned rights for the table " << tableName << "to user: "<< username << std::endl;
-        file.close();
 
-        fs::permissions(rightsFile,
-                        fs::perms::all);
+        file << username << "," << right << "\n";
+        if (!file.good()) {
+            std::cerr << "Failed to write to file: " << rightsFile << std::endl;
+            file.close();
+            return false;
+        }
+
+        std::cout << "Assigned rights for the table " << tableName << " to user: " << username << std::endl;
+        file.close();
         return true;
     }
-    return false;
 }
+
 
 bool Database::insert(std::string data, std::string tableName, std::string user) {
     if (!hasRights(user, "IUDS", tableName) &&
@@ -199,20 +216,24 @@ bool Database::insert(std::string data, std::string tableName, std::string user)
     std::string filePath = "/tmp/semestralka/" + tableName + ".csv";
     std::fstream file(filePath, std::ios::in | std::ios::out | std::ios::app);
 
+
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filePath << std::endl;
         return false;
     }
 
-    int nextId = getCount(filePath);
-    std::string lineToInsert = std::to_string(nextId) + "," + data + "\n";
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        int nextId = getCount(filePath);
+        std::string lineToInsert = std::to_string(nextId) + "," + data + "\n";
 
-    file.seekp(0, std::ios::end);
-    file << lineToInsert;
+        file.seekp(0, std::ios::end);
+        file << lineToInsert;
 
-    std::cout << "User " + user + " has inserted data " + data + " into " + tableName << std::endl;
-    file.close();
-    return true;
+        std::cout << "User " + user + " has inserted data " + data + " into " + tableName << std::endl;
+        file.close();
+        return true;
+    }
 }
 
 
@@ -252,36 +273,39 @@ bool Database::update(std::string primaryKey, std::string data, std::string tabl
         return false;
     }
 
-    //skipping header
-    if (!getline(file, header)) {
-        std::cerr << "Failed to read header from file: " << filePath << std::endl;
-        return false;
-    }
-    updatedContent << header << "\n";
-
-    bool updateSuccess = false;
-    while (getline(file, line)) {
-        std::istringstream iss(line);
-        std::string id;
-        getline(iss, id, ',');
-        if (id == primaryKey) {
-            updatedContent << id << "," << data << "\n";
-            updateSuccess = true;
-        } else {
-            updatedContent << line << "\n";
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        //skipping header
+        if (!getline(file, header)) {
+            std::cerr << "Failed to read header from file: " << filePath << std::endl;
+            return false;
         }
-    }
-    file.close();
+        updatedContent << header << "\n";
 
-    std::ofstream outFile(filePath);
-    if (!outFile.is_open()) {
-        std::cerr << "Failed to open file for writing: " << filePath << std::endl;
-        return false;
-    }
-    outFile << updatedContent.str();
-    outFile.close();
+        bool updateSuccess = false;
+        while (getline(file, line)) {
+            std::istringstream iss(line);
+            std::string id;
+            getline(iss, id, ',');
+            if (id == primaryKey) {
+                updatedContent << id << "," << data << "\n";
+                updateSuccess = true;
+            } else {
+                updatedContent << line << "\n";
+            }
+        }
+        file.close();
 
-    return updateSuccess;
+        std::ofstream outFile(filePath);
+        if (!outFile.is_open()) {
+            std::cerr << "Failed to open file for writing: " << filePath << std::endl;
+            return false;
+        }
+        outFile << updatedContent.str();
+        outFile.close();
+
+        return updateSuccess;
+    }
 }
 
 bool Database::addColumn(std::string columnName, std::string user, std::string tableName)
@@ -294,51 +318,57 @@ bool Database::addColumn(std::string columnName, std::string user, std::string t
         std::string header;
         std::string trimmedHeader;
         int count = 0;
-        while (getline(t, line)) {
-            if (count == 0) {
-                header = line;
-                trimmedHeader = header.substr(0, header.size() - 2);
-                trimmedHeader += "," + columnName + "\n";
-                count++;
+
+        std::lock_guard<std::mutex> csvLock(logMutex);
+        {
+            while (getline(t, line)) {
+                if (count == 0) {
+                    header = line;
+                    trimmedHeader = header.substr(0, header.size() - 2);
+                    trimmedHeader += "," + columnName + "\n";
+                    count++;
+                } else {
+                    trimmedHeader += line;
+                }
             }
-            else {
-                trimmedHeader += line;
-            }
-        }
-        std::fstream file;
-        if (file) {
-            file.open(tblName);
+            std::fstream file;
             if (file) {
-                file << trimmedHeader;
+                file.open(tblName);
+                if (file) {
+                    file << trimmedHeader;
 
+                }
+
+                std::cout << "User " + user + " has added column " + columnName + " to table " + tableName << std::endl;
+                file.close();
+                return true;
             }
-
-            std::cout << "User " + user + " has added column "+ columnName + " to table " + tableName << std::endl;
-            file.close();
-            return true;
         }
-    }
         return false;
+    }
 }
+
 std::string Database::findUserinCsvFile(std::string fileName, std::string username)
 {
     std::fstream ip(fileName);
     std::string line;
     std::string fail;
-    while (std::getline(ip, line))
+
+    std::lock_guard<std::mutex> csvLock(logMutex);
     {
-        std::istringstream iss(line);
-        std::string id, usernameDt, passwordDt;
-        if (std::getline(iss, id, ',') && std::getline(iss, usernameDt, ',')) {
-            if (usernameDt == username) {
-                return usernameDt;
-            }
-            else {
-                fail = "notfound";
+        while (std::getline(ip, line)) {
+            std::istringstream iss(line);
+            std::string id, usernameDt, passwordDt;
+            if (std::getline(iss, id, ',') && std::getline(iss, usernameDt, ',')) {
+                if (usernameDt == username) {
+                    return usernameDt;
+                } else {
+                    fail = "notfound";
+                }
             }
         }
+        return fail;
     }
-    return fail;
 }
 
 bool Database::fileExists(std::string& fileName)
@@ -349,70 +379,81 @@ bool Database::fileExists(std::string& fileName)
 std::string Database::loginUser(std::string userName, std::string password) {
     const char *fileName = "/tmp/semestralka/Users_table.csv";
     std::string flName = "/tmp/semestralka/Users_table.csv";
-    if (!fileExists(flName)) {
-        std::fstream file;
-        if (file) {
-            file.open(flName);
-            if (file) {
-                file << "id,username,password\n";
-                file << "0,admin,admin\n";
-            }
-            file.close();
-        }
-    }
-    if (findUserinCsvFile(fileName, userName) == userName) {
-        std::cout<<userName;
-        return userName;
-    }
 
-    return "";
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        if (!fileExists(flName)) {
+            std::fstream file;
+            if (file) {
+                file.open(flName);
+                if (file) {
+                    file << "id,username,password\n";
+                    file << "0,admin,admin\n";
+                }
+                file.close();
+            }
+        }
+        if (findUserinCsvFile(fileName, userName) == userName) {
+            std::cout<<userName;
+            return userName;
+        }
+        return "";
+    }
 }
 bool Database::registerUser(const std::string& userName, std::string password)
 {
     std::string fileName = "/tmp/semestralka/Users_table.txt";
-    if (!fileExists(fileName)) {
-        std::fstream file;
-        if (file) {
-            file.open(fileName);
+
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        if (!fileExists(fileName)) {
+            std::fstream file;
             if (file) {
-                file << "id,username,password\n";
-                file << "0,admin,admin\n";
+                file.open(fileName);
+                if (file) {
+                    file << "id,username,password\n";
+                    file << "0,admin,admin\n";
+                }
+                file.close();
             }
-            file.close();
         }
-    }
-    int count = getCount(fileName);
-    std::stringstream dataStream;
-    dataStream << count;
-    std::string data;
-    dataStream >> data;
-    data += "," + userName + "," + password +"\n";
-    try {
-        std::fstream file;
-        if (file) {
-            file.open(fileName);
+        int count = getCount(fileName);
+        std::stringstream dataStream;
+        dataStream << count;
+        std::string data;
+        dataStream >> data;
+        data += "," + userName + "," + password +"\n";
+        try {
+            std::fstream file;
             if (file) {
-                file << data ;
+                file.open(fileName);
+                if (file) {
+                    file << data ;
+                }
+                file.close();
             }
-            file.close();
+            return findUserinCsvFile(fileName, userName) == userName;
+        } catch (std::string Err) {
+            return false;
         }
-        return findUserinCsvFile(fileName, userName) == userName;
-    } catch (std::string Err) {
-        return false;
     }
 }
 
-std::string Database::getCertainCount(std::string fileName, std::string primaryKey){
-    std::ifstream ip(fileName);
-    std::string line;
-    int count = 0;
-    while (std::getline(ip, line)) {
-        count++;
-        if (count - 1 == atoi(reinterpret_cast<const char*>(primaryKey.c_str()))) {
-            return line;
+std::string Database::getCertainCount(std::string fileName, std::string primaryKey)
+{
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        std::fstream ip(fileName);
+        std::string line;
+        int count = 0;
+        while (std::getline(ip, line)) {
+            count++;
+            if (count - 1 == atoi(reinterpret_cast<const char *>(primaryKey.c_str()))) {
+                return line;
+            }
         }
+        return "Not found";
     }
-    return "Not found";
 }
 std::string Database::getRow(std::string primaryKey, std::string user, std::string tableName)
 {
@@ -432,10 +473,14 @@ std::string Database::getRows(std::string user, std::string tableName)
         std::ifstream file("/tmp/semestralka/" + tableName + ".csv");
         std::string line;
         std::string result;
-        while (getline(file, line)) {
-            result += "|" + line +  "|\n";
+
+        std::lock_guard<std::mutex> csvLock(logMutex);
+        {
+            while (getline(file, line)) {
+                result += "|" + line +  "|\n";
+            }
+            return result;
         }
-        return result;
     }
     else {
         return "User " + user + " has no right to select items from " + tableName;
@@ -454,39 +499,43 @@ bool Database::deleteRow(std::string primaryKey, std::string user, std::string t
     std::string line, header;
     std::stringstream updatedContent;
 
+
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filePath << std::endl;
         return false;
     }
 
-    // skip header
-    if (!getline(file, header)) {
-        std::cerr << "Failed to read header from file: " << filePath << std::endl;
-        return false;
-    }
-    updatedContent << header << "\n";
-
-    bool deleteSuccess = false;
-    while (getline(file, line)) {
-        std::istringstream iss(line);
-        std::string id;
-        getline(iss, id, ',');
-        if (id != primaryKey) {
-            updatedContent << line << "\n";
-        } else {
-            deleteSuccess = true;
+    std::lock_guard<std::mutex> csvLock(logMutex);
+    {
+        // skip header
+        if (!getline(file, header)) {
+            std::cerr << "Failed to read header from file: " << filePath << std::endl;
+            return false;
         }
-    }
-    file.close();
+        updatedContent << header << "\n";
 
-    std::ofstream outFile(filePath);
-    if (!outFile.is_open()) {
-        std::cerr << "Failed to open file for writing: " << filePath << std::endl;
-        return false;
-    }
-    outFile << updatedContent.str();
-    outFile.close();
+        bool deleteSuccess = false;
+        while (getline(file, line)) {
+            std::istringstream iss(line);
+            std::string id;
+            getline(iss, id, ',');
+            if (id != primaryKey) {
+                updatedContent << line << "\n";
+            } else {
+                deleteSuccess = true;
+            }
+        }
+        file.close();
 
-    return deleteSuccess;
+        std::ofstream outFile(filePath);
+        if (!outFile.is_open()) {
+            std::cerr << "Failed to open file for writing: " << filePath << std::endl;
+            return false;
+        }
+        outFile << updatedContent.str();
+        outFile.close();
+
+        return deleteSuccess;
+    }
 }
 

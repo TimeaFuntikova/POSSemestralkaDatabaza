@@ -79,7 +79,7 @@ public:
 
 private:
     std::map<std::string, std::unique_ptr<Table>> tables;
-    std::mutex dbMutex;
+    static std::mutex dbMutex;
     std::map<std::string, User> users;
 
     int getCount(std::string fileName);
