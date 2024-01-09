@@ -4,9 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/tmp/semestralka/client.cpp" "/tmp/semestralka/cmake-build-debug/CMakeFiles/semestralka.dir/client.cpp.o"
-  "/tmp/semestralka/database.cpp" "/tmp/semestralka/cmake-build-debug/CMakeFiles/semestralka.dir/database.cpp.o"
-  "/tmp/semestralka/server.cpp" "/tmp/semestralka/cmake-build-debug/CMakeFiles/semestralka.dir/server.cpp.o"
+  "/tmp/semestralka/database.cpp" "/tmp/semestralka/cmake-build-debug/CMakeFiles/server.dir/database.cpp.o"
+  "/tmp/semestralka/server.cpp" "/tmp/semestralka/cmake-build-debug/CMakeFiles/server.dir/server.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

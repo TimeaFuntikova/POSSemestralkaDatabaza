@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/semestralka.dir/DatabaseLogic.cpp.o"
-  "CMakeFiles/semestralka.dir/Tables.cpp.o"
   "CMakeFiles/semestralka.dir/client.cpp.o"
+  "CMakeFiles/semestralka.dir/database.cpp.o"
+  "CMakeFiles/semestralka.dir/server.cpp.o"
   "semestralka"
   "semestralka.pdb"
 )

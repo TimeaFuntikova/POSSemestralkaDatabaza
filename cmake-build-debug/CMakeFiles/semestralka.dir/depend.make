@@ -3,3 +3,9 @@
 
 CMakeFiles/semestralka.dir/client.cpp.o: ../client.cpp
 
+CMakeFiles/semestralka.dir/database.cpp.o: ../database.cpp
+CMakeFiles/semestralka.dir/database.cpp.o: ../database.h
+
+CMakeFiles/semestralka.dir/server.cpp.o: ../database.h
+CMakeFiles/semestralka.dir/server.cpp.o: ../server.cpp
+

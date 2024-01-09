@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/tmp/semestralka/database.cpp
+database.h
+/tmp/semestralka/database.h
+fstream
+-
+iostream
+-
+sstream
+-
+memory
+-
+
+/tmp/semestralka/database.h
+string
+-
+utility
+-
+vector
+-
+map
+-
+mutex
+-
+optional
+-
+set
+-
+memory
+-
+
