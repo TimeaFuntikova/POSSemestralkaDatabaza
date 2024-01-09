@@ -222,7 +222,9 @@ void *handleClient(void *clientSocket) {
         }
 
         std::string request(buffer, bytesReceived);
+
         std::string response = processRequest(request, db, username);
+
         send(socket, response.c_str(), response.size(), 0);
 
         if (request == "q") {
@@ -245,7 +247,7 @@ int main() {
         return -1;
     }
 
-    int port = 8082;
+    int port = 8084;
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);

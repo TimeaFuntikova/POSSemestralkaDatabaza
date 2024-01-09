@@ -48,6 +48,7 @@ private:
 
 class Database {
 public:
+
     void createTable(const std::string& tableName, const std::vector<Column>& columns, const std::string& creatorUsername);
     static void saveTableStructure(const Table& table);
     std::vector<std::string> listTablesCreatedByUser(const std::string& username);
@@ -79,9 +80,8 @@ public:
 
 private:
     std::map<std::string, std::unique_ptr<Table>> tables;
-    static std::mutex dbMutex;
     std::map<std::string, User> users;
-
+    static std::mutex dbMutex;
     int getCount(std::string fileName);
 
 

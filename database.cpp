@@ -1,12 +1,16 @@
 #include "database.h"
 #include <fstream>
 #include <iostream>
-#import <sstream>
+#include <sstream>
 #include <memory>
 #include <filesystem>
 #include <utility>
 
 namespace fs = std::filesystem;
+
+
+std::mutex logMutex;
+std::mutex Database::dbMutex;
 
 void Database::saveTableCreatorInfo() {
     std::ofstream file("table_creators.csv");
@@ -99,7 +103,7 @@ bool Database::deleteTable(const std::string& username, const std::string& table
         return true;
     }
 }
-std::mutex logMutex;
+
 
 void Database::saveTableStructure(const Table& table) {
     std::lock_guard<std::mutex> guard(dbMutex);
@@ -124,7 +128,6 @@ void Database::saveTableStructure(const Table& table) {
             std::cout << "Created header for the table " << table.getName() << std::endl;
             file.close();
         }
-
 
         //VYTVORENIE PRAV PRE TABULKU
         std::string rightsFile = "/tmp/semestralka/" + table.getName() + "_rights.csv";

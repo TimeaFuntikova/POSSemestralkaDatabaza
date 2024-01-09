@@ -62,7 +62,7 @@ int main() {
 
     struct sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(8082);
+    serverAddr.sin_port = htons(8084);
     serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if (connect(clientSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == -1) {
@@ -71,8 +71,7 @@ int main() {
         return -2;
     }
 
-    std::cout << "LOGIN or REGISTER\n";
-
+    std::cout << " --Welcome to database server first you need to login or register --\n";
     std::string username = getUsername();
     send(clientSocket, username.c_str(), username.size(), 0);
 
