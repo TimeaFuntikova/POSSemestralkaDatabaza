@@ -407,8 +407,6 @@ bool Database::registerUser(const std::string& userName, std::string password)
 {
     std::string fileName = "/tmp/semestralka/Users_table.txt";
 
-    std::lock_guard<std::mutex> csvLock(logMutex);
-    {
         if (!fileExists(fileName)) {
             std::fstream file;
             if (file) {
@@ -439,7 +437,6 @@ bool Database::registerUser(const std::string& userName, std::string password)
         } catch (std::string Err) {
             return false;
         }
-    }
 }
 
 std::string Database::getCertainCount(std::string fileName, std::string primaryKey)
