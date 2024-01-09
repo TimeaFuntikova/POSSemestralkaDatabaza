@@ -147,6 +147,15 @@ std::string processRequest(const std::string& request, Database& db, const std::
         iss >> tableName;
 
         return db.getRow(primaryKey, username, tableName);
+    } else if(command == "ADD_COLUMN") {
+
+        std::string columnName;
+        iss >> columnName;
+
+        std::string tableName;
+        iss >> tableName;
+
+        if(db.addColumn(columnName, username, tableName)) return "Column added.";
     }
     return "Unknown command.\n";
 }
